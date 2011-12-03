@@ -22,7 +22,7 @@
 #include <cmath>
 #include "intersection_point.h"
 #include "ray.h"
-#include "vector.h"
+#include "Vector.h"
 #include <stdio.h>
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -37,8 +37,6 @@ using namespace std;
 #define factor 0.1000
 
 
-
-
 // A ball.  A ball has a radius, a color, and bounces up and down between
 // a maximum height and the xz plane.  Therefore its x and z coordinates
 // are fixed.  It uses a lame bouncing algorithm, simply moving up or
@@ -49,20 +47,24 @@ public:
   double radius;
   GLfloat* color;
   double maximumHeight;
-  double minimumHeight;
   double x;
   double y;
   double z;
   double inc_factor;  //for the increment in motion
-  vector v;  //for the direction
-  int direction;
+  Vector v;  //for the direction
   double mass;
-  double theta;
   double gravity;
   double time;
+  double speed;
   int flag;
-  vector starting;
-  vector starting_v;
+  Vector starting;
+  Vector starting_v;
+
+
+/*
+ * Variables for openAL
+ */
+
   ALuint Source;
   ALuint Buffer;
 
@@ -82,23 +84,27 @@ public:
   // Also note that these should be units of '1'.
   ALfloat ListenerOri[6];
 
-  //for texture
+  /*
+   * Texture Variable
+   */
   unsigned int g_Texture;
 
 
-
 public:
-  int motion;
+//  int motion;
+  //int direction;
 public:
-  Ball(double r, GLfloat* c, double h, double x, double z,double t,double m);
-  void update();
+  Ball();
+  Ball(double r, GLfloat* c, double h, double x, double z,Vector v1,double m,double s);
+/*
+ *   void update();
+ */
 	void intersection_with_walls(double width,double height);
 	void set_start_position();
 void intersection_with_balls(int index,Ball balls[],int no_of_balls);
 
 void rolling(int i,Ball balls[],int no_of_balls,double width,double height);  //where the integer i represents the index of the ball in the balls array
 
-void initialize_texture();
 void check_inside(double x,double y);
 /*
  * ALboolean LoadALData()

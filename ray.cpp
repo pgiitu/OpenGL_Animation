@@ -6,7 +6,7 @@
  */
 
 #include "ray.h"
-#include "vector.h"
+#include "Vector.h"
 
 ray::ray()
 {
@@ -18,7 +18,7 @@ ray::ray()
 	e.z=0.0;
 }
 
-ray::ray(vector a,vector b)
+ray::ray(Vector a,Vector b)
 {
 	s.x=a.x;
 	s.y=a.y;

@@ -7,13 +7,13 @@ CPP_SRCS += \
 ../Ball.cpp \
 ../Camera.cpp \
 ../Checkerboard.cpp \
+../Vector.cpp \
 ../intersection_point.cpp \
 ../main.cpp \
 ../main_animation.cpp \
 ../ray.cpp \
 ../sound.cpp \
-../texture.cpp \
-../vector.cpp 
+../texture.cpp 
 
 C_SRCS += \
 ../bmpLoader.c \
@@ -24,6 +24,7 @@ OBJS += \
 ./Ball.o \
 ./Camera.o \
 ./Checkerboard.o \
+./Vector.o \
 ./bmpLoader.o \
 ./intersection_point.o \
 ./main.o \
@@ -32,8 +33,7 @@ OBJS += \
 ./ray.o \
 ./sound.o \
 ./texture.o \
-./tgaLoader.o \
-./vector.o 
+./tgaLoader.o 
 
 C_DEPS += \
 ./bmpLoader.d \
@@ -44,13 +44,13 @@ CPP_DEPS += \
 ./Ball.d \
 ./Camera.d \
 ./Checkerboard.d \
+./Vector.d \
 ./intersection_point.d \
 ./main.d \
 ./main_animation.d \
 ./ray.d \
 ./sound.d \
-./texture.d \
-./vector.d 
+./texture.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

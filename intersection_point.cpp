@@ -12,8 +12,8 @@ using namespace std;
 
 intersection_point::intersection_point() {
 	// TODO Auto-generated constructor stub
-	r.e=vector();
-	r.s=vector();
+	r.e=Vector();
+	r.s=Vector();
 
 	v.x=0.0;
 	v.y=0.0;

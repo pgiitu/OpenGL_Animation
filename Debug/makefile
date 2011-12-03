@@ -37,19 +37,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: Graphics\ Project
+all: Graphics\ Project_version2
 
 # Tool invocations
-Graphics\ Project: $(OBJS) $(USER_OBJS)
+Graphics\ Project_version2: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	g++  -o "Graphics Project" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/usr/lib -o "Graphics Project_version2" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(C++_DEPS)$(OBJS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) "Graphics Project"
+	-$(RM) $(C++_DEPS)$(OBJS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) "Graphics Project_version2"
 	-@echo ' '
 
 .PHONY: all clean dependents

@@ -7,16 +7,16 @@
 
 #ifndef RAY_H_
 #define RAY_H_
-#include "vector.h"
+#include "Vector.h"
 
 class ray {
 public:
-	vector s;
-	vector e;
+	Vector s;
+	Vector e;
 
 	ray();
 
-	ray(vector a,vector b);
+	ray(Vector a,Vector b);
 	virtual ~ray();
 };
 

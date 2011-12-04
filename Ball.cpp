@@ -10,8 +10,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <iostream>
-#include "intersection_point.h"
-#include "ray.h"
+#include <string.h>
 #include "Vector.h"
 #include "Ball.h"
 using namespace std;
@@ -66,7 +65,17 @@ Ball::Ball(double r, GLfloat* c, double h, double x, double z,Vector v1,double m
 */
 	  starting=v1.multiply_scalar(3);
 
+	  launched=0;
 	  //finish texture
+
+
+// faltu variables
+	  //	  direction=1;
+	  //	  motion=1;
+
+/*
+ * Code for openal(sound)
+ */
 
 	  for(int k=0;k<3;k++)
 	  {
@@ -76,13 +85,6 @@ Ball::Ball(double r, GLfloat* c, double h, double x, double z,Vector v1,double m
 		  ListenerVel[k]=0.0;
 	  }
 
-// faltu variables
-	  //	  direction=1;
-	  //	  motion=1;
-
-/*
- * Code for openal(sound)
- */
 
 	  ListenerOri[0] = 0.0;
 	  ListenerOri[1]=0.0;
@@ -93,9 +95,17 @@ Ball::Ball(double r, GLfloat* c, double h, double x, double z,Vector v1,double m
 
   	alutInit(NULL, 0);
   	alGetError();
+//  	char *s2="wavdata/mysound3.wav";
+//  	play_sound(s2);
 
+
+
+  }
+
+void Ball::play_sound(char *s1)
+{
   	// Load the wav data.
-  	if(LoadALData() == AL_FALSE)
+  	if(LoadALData(s1) == AL_FALSE)
   	{
   	    printf("Error loading data.");
   		//return 0;
@@ -104,10 +114,11 @@ Ball::Ball(double r, GLfloat* c, double h, double x, double z,Vector v1,double m
   	SetListenerValues();
   	// Setup an exit procedure.
 
+
   	//atexit(KillALData);
+	  alSourcePlay(Source);
 
-  }
-
+}
 
 /*
  *Extraneous function
@@ -129,77 +140,38 @@ void Ball::set_start_position()
 {
 	flag=1;
 }
-/*
-void Ball::rolling(int i,Ball balls[],int no_of_balls,double width,double height)  //where the integer i represents the index of the ball in the balls array
+
+void Ball::rolling(int i,Ball balls[],int no_of_balls,double width,double depth,double height)  //where the integer i represents the index of the ball in the balls array
   {
 
-    intersection_with_walls(width,height);
+	if(launched==0)
+	{
+		  char *s3="wavdata/cannon_sound.wav";
+		  play_sound(s3);
+		  launched=1;
+	}
+
+
+    intersection_with_walls(width,depth);
   	intersection_with_balls(i,balls,no_of_balls);
 
-  	this->time=this->time+time_inc;
-  	double t=this->time;
-
-  	v=starting_v + acc.multiply_scalar(t);
-
-
-  	Vector n1=starting + ((starting_v.multiply_scalar(t)) + (acc.multiply_scalar(0.5*t*t)));
-    x=n1.x;
-    y=n1.y;
-    z=n1.z;
-
-    intersection_with_walls(width,height);
-  	intersection_with_balls(i,balls,no_of_balls);
-
-    if(y<radius)
-  	{
-  		  v.y=-factor*v.y;
-  		  maximumHeight=(v.y*v.y)/(2*9.806);
-			y=radius;
-  		set_start_position();
-  	}
-    else
-    {
-
-    	if(y>maximumHeight)
-  		{
-  			  v.y=0.0;
-  			set_start_position();
-  		}
-    }
-
-    if(flag==1)
-  	{
-  		time=0.0;
-  		flag=0;
-  		starting.x=this->x;
-  		starting.y=this->y;
-  		starting.z=this->z;
-  		starting_v=v;
-  	}
-
-	  	glPushMatrix();
-	    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
-
-	    glTranslated(x, y, z);
-	    //glRotated(10,0,1.0,0);
-
-	    glutSolidSphere(radius, 30, 30);
-	    glPopMatrix();
-  }
-*/
-
-void Ball::rolling(int i,Ball balls[],int no_of_balls,double width,double height)  //where the integer i represents the index of the ball in the balls array
-  {
-
-    intersection_with_walls(width,height);
-  	intersection_with_balls(i,balls,no_of_balls);
-
+	char *s4="wavdata/mysound1.wav";
     if(y<radius)
    	{
    		  v.y=-factor*v.y;
    		  maximumHeight=(v.y*v.y)/(2*9.806);
  		  y=radius;
    		  set_start_position();
+		  //play_sound(s4);
+   	}
+
+    if(y+radius>(height-1))
+   	{
+   		  v.y=-factor*v.y;
+   		  //maximumHeight=(v.y*v.y)/(2*9.806);
+ 		  y=height-1-radius-0.01;
+   		  set_start_position();
+		  play_sound(s4);
    	}
      else
      {
@@ -234,8 +206,6 @@ void Ball::rolling(int i,Ball balls[],int no_of_balls,double width,double height
 //    intersection_with_walls(width,height);
  // 	intersection_with_balls(i,balls,no_of_balls);
 
-
-
 	  	glPushMatrix();
 	    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
 
@@ -244,6 +214,8 @@ void Ball::rolling(int i,Ball balls[],int no_of_balls,double width,double height
 
 	    glutSolidSphere(radius, 30, 30);
 	    glPopMatrix();
+
+
   }
 
 
@@ -252,14 +224,14 @@ void Ball::intersection_with_walls(double width,double height)
 {
 		Vector ret=v;
 
-
-
+		  char *s3="wavdata/mysound1.wav";
 
 		// collision with the side wall Z plane
 		if(z<=radius)
 		{
 			v.z=-1*v.z;
 			z=radius+0.001;
+			  play_sound(s3);
 
 			set_start_position();
 		}
@@ -269,6 +241,7 @@ void Ball::intersection_with_walls(double width,double height)
 		{
 			v.z=-1*v.z;
 			z=(height-1)-radius-0.001;
+			  play_sound(s3);
 
 			  set_start_position();
 		}
@@ -278,6 +251,7 @@ void Ball::intersection_with_walls(double width,double height)
 		{
 			v.x=-1*v.x;
 			x=radius+0.001;
+			  play_sound(s3);
 
 			  set_start_position();
 
@@ -288,6 +262,7 @@ void Ball::intersection_with_walls(double width,double height)
 		{
 			x=(width-1)-radius-0.001;
 			v.x=-1*v.x;
+			  play_sound(s3);
 
 			set_start_position();
 		}
@@ -309,7 +284,9 @@ void Ball::intersection_with_balls(int index,Ball balls[],int no_of_balls)
 			  double dis=dir_centers.magnitude();
 			  if((radius1+radius2)>=dis)
 			  {
-				  alSourcePlay(Source);
+				  char *s3="wavdata/mysound3.wav";
+				  play_sound(s3);
+				  //alSourcePlay(Source);
 
 				  set_start_position();
 
@@ -409,7 +386,7 @@ void Ball::update() {
  *	utility and send the data into OpenAL as a buffer. A source is then
  *	also created to play that buffer.
  */
-ALboolean Ball::LoadALData()
+ALboolean Ball::LoadALData(char *s)
 {
 	// Variables to load into.
 
@@ -426,7 +403,10 @@ ALboolean Ball::LoadALData()
 	if(alGetError() != AL_NO_ERROR)
 		return AL_FALSE;
 
-	alutLoadWAVFile((ALbyte*)"wavdata/mysound3.wav", &format, &data, &size, &freq, &loop);
+//	alutLoadWAVFile((ALbyte*)"wavdata/mysound3.wav", &format, &data, &size, &freq, &loop);
+//	  	  char *p;
+//		  p=&s[0];
+	alutLoadWAVFile((ALbyte*)s, &format, &data, &size, &freq, &loop);
 	alBufferData(Buffer, format, data, size, freq);
 	alutUnloadWAV(format, data, size, freq);
 
@@ -465,7 +445,6 @@ void Ball::SetListenerValues()
 	alListenerfv(AL_VELOCITY,    ListenerVel);
 	alListenerfv(AL_ORIENTATION, ListenerOri);
 }
-
 
 
 /*

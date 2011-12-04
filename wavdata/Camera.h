@@ -10,6 +10,7 @@
 #include <GLUT/glut.h>
 #include <GL/glut.h>
 #include <cmath>
+#include "ray.h"
 #include "Vector.h"
 #include <stdio.h>
 using namespace std;

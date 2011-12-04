@@ -20,8 +20,6 @@
 #include <GL/glut.h>
 #endif
 #include <cmath>
-#include "intersection_point.h"
-#include "ray.h"
 #include "Vector.h"
 #include <stdio.h>
 #include <AL/al.h>
@@ -30,7 +28,6 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alut.h>
-#include "texture.h"
 
 using namespace std;
 
@@ -59,6 +56,7 @@ public:
   int flag;
   Vector starting;
   Vector starting_v;
+  int launched; //to specify whether has been launched of not. by default it is zero
 
 
 /*
@@ -103,7 +101,7 @@ public:
 	void set_start_position();
 void intersection_with_balls(int index,Ball balls[],int no_of_balls);
 
-void rolling(int i,Ball balls[],int no_of_balls,double width,double height);  //where the integer i represents the index of the ball in the balls array
+void rolling(int i,Ball balls[],int no_of_balls,double width,double depth,double height);  //where the integer i represents the index of the ball in the balls array
 
 void check_inside(double x,double y);
 /*
@@ -113,7 +111,7 @@ void check_inside(double x,double y);
  *	utility and send the data into OpenAL as a buffer. A source is then
  *	also created to play that buffer.
  */
-ALboolean LoadALData();
+ALboolean LoadALData(char *s);
 /*
  * void SetListenerValues()
  *
@@ -122,7 +120,7 @@ ALboolean LoadALData();
  */
 void SetListenerValues();
 
-
+void play_sound(char *s1);
 
 /*
  * void KillALData()

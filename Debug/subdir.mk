@@ -6,51 +6,26 @@
 CPP_SRCS += \
 ../Ball.cpp \
 ../Camera.cpp \
-../Checkerboard.cpp \
+../Room.cpp \
 ../Vector.cpp \
-../intersection_point.cpp \
 ../main.cpp \
-../main_animation.cpp \
-../ray.cpp \
-../sound.cpp \
-../texture.cpp 
-
-C_SRCS += \
-../bmpLoader.c \
-../pcxLoader.c \
-../tgaLoader.c 
+../main_animation.cpp 
 
 OBJS += \
 ./Ball.o \
 ./Camera.o \
-./Checkerboard.o \
+./Room.o \
 ./Vector.o \
-./bmpLoader.o \
-./intersection_point.o \
 ./main.o \
-./main_animation.o \
-./pcxLoader.o \
-./ray.o \
-./sound.o \
-./texture.o \
-./tgaLoader.o 
-
-C_DEPS += \
-./bmpLoader.d \
-./pcxLoader.d \
-./tgaLoader.d 
+./main_animation.o 
 
 CPP_DEPS += \
 ./Ball.d \
 ./Camera.d \
-./Checkerboard.d \
+./Room.d \
 ./Vector.d \
-./intersection_point.d \
 ./main.d \
-./main_animation.d \
-./ray.d \
-./sound.d \
-./texture.d 
+./main_animation.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -58,13 +33,6 @@ CPP_DEPS += \
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross G++ Compiler'
 	g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-%.o: ../%.c
-	@echo 'Building file: $<'
-	@echo 'Invoking: Cross GCC Compiler'
-	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

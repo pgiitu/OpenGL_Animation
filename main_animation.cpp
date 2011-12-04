@@ -1,4 +1,4 @@
-// This application shows balls bouncing on a checkerboard, with no respect
+// This application shows balls bouncing on a Room, with no respect
 // for the laws of Newtonian Mechanics.  There's a little spotlight to make
 // the animation interesting, and arrow keys move the camera for even more
 // fun.
@@ -13,10 +13,8 @@
 #include <string.h>
 #include <iostream>
 #include <cmath>
-#include "intersection_point.h"
-#include "ray.h"
 #include "Ball.h"
-#include "Checkerboard.h"
+#include "Room.h"
 #include "Camera.h"
 #include "Vector.h"
 using namespace std;
@@ -26,22 +24,34 @@ GLfloat RED[] = {1, 0, 0};
 GLfloat GREEN[] = {0, 1, 0};
 GLfloat MAGENTA[] = {1, 0, 1};
 
-GLfloat cannon_dir[]={5.0,-5.0,3.0};
-//Vector ball_dir(1.0,1.0,-1.0);
+/*
+ * initial direction of the cannon
+ */
+GLfloat cannon_dir[]={0.0,0.0,3.0};
+
 Vector ball_dir(cannon_dir[0],cannon_dir[1],cannon_dir[2]);
+
 float  initial[16] = { 1.0, 0.0, 0.0, 0.0,0.0, 1.0, 0.0, 0.0,  0.0, 0.0, 1.0, 0.0,  0.0, 0.0, 0.0, 1.0 };
 
+//for storing the current model view matrix
+GLfloat matrix[16];
 
-
+/*
+ * array of string to hold the names of the color to be displayed to the user
+ */
 string s_colors[]={"White","Silver","Gray","Black","Red","Maroon","Yellow","Olive","Lime","Green","Aqua","Teal","Blue","Navy","Fuchsia","Purple"};
 
+/*
+ * RBG values of different colors
+ */
 GLfloat color_rgb[][3]={{1, 1, 1},{0.75, 0.75, 0.75},{0.5, 0.5, 0.5},{0.0, 0.0, 0.0},{1, 0.0, 0.0}
 ,{0.5, 0.0, 0.0},{1, 1, 0.0},{0.5, 0.5, 0.0},{0.0, 1, 0.0},{0.0, 0.5,0.0},{0.0, 1, 1},{0.0, 0.5, 0.5}
 ,{0.0, 0.0, 1},{0.0, 0.0, 0.5},{1, 0.0, 1},{0.5, 0.0, 0.5}};
 
 
-
 int no_of_colors=16;
+
+
 
 
 /*
@@ -82,13 +92,17 @@ Fuchsia	#FF00FF	100%	0%	100%	300°	100%	50%	100%	100%	13 (high magenta); magenta
 Purple	#800080	50%	0%	50%	300°	100%	25%	100%	50%	5 (low magenta)
 */
 
+/*
+ * Defining the geometry of the room
+ */
 #define factor 0.1000
 #define width 30
-#define height 30
+#define depth 30
+#define height 9
 
 
-// Global variables: a camera, a checkerboard and some balls.
-Checkerboard checkerboard(width,height);
+// Global variables: a camera, a Room and some balls.
+Room r1(width,depth,height);
 double v_w;
 double v_h;
 Camera camera;
@@ -109,47 +123,42 @@ void init() {
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
 
-/*
-  // for texture
 
-	// enable texturing
-	glEnable(GL_TEXTURE_2D);
-
-	// tell openGL to generate the texture coords for a sphere map
-	glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_SPHERE_MAP);
-	glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,GL_SPHERE_MAP);
-
-	// enable automatic texture coordinate generation
-	glEnable(GL_TEXTURE_GEN_S);
-	glEnable(GL_TEXTURE_GEN_T);
-*/
-
-  checkerboard.create();
+  r1.create();
 }
-GLfloat cannon_color[]={0.3,0.7,0.9};
+GLfloat cannon_color[]={0.6,0.0,0.0};
 
+
+/*
+ * function to calculate the direction of the cannon
+ */
 
 void find_cannon_dir(int id)
 {
-//	float *fl;
-//	direction->get_float_array_val(fl);
-
 
 	double x_dir=cannon_dir[0]*initial[0]+cannon_dir[1]*initial[1]+cannon_dir[2]*initial[2];
 	double y_dir=cannon_dir[0]*initial[4]+cannon_dir[1]*initial[5]+cannon_dir[2]*initial[6];
 	double z_dir=cannon_dir[0]*initial[8]+cannon_dir[1]*initial[9]+cannon_dir[2]*initial[10];
+
 /*
-	double x_dir=cannon_dir[0]*fl[0]+cannon_dir[1]*fl[1]+cannon_dir[2]*fl[2];
-	double y_dir=cannon_dir[0]*fl[4]+cannon_dir[1]*fl[5]+cannon_dir[2]*fl[6];
-	double z_dir=cannon_dir[0]*fl[8]+cannon_dir[1]*fl[9]+cannon_dir[2]*fl[10];
+	double x_dir=cannon_dir[0]*matrix[0]+cannon_dir[1]*matrix[1]+cannon_dir[2]*matrix[2];
+	double y_dir=cannon_dir[0]*matrix[4]+cannon_dir[1]*matrix[5]+cannon_dir[2]*matrix[6];
+	double z_dir=cannon_dir[0]*matrix[8]+cannon_dir[1]*matrix[9]+cannon_dir[2]*matrix[10];
+*/
+/*
+	double x_dir=cannon_dir[0]*matrix[0]+cannon_dir[1]*matrix[4]+cannon_dir[2]*matrix[8];
+	double y_dir=cannon_dir[0]*matrix[1]+cannon_dir[1]*matrix[5]+cannon_dir[2]*matrix[9];
+	double z_dir=cannon_dir[0]*matrix[2]+cannon_dir[1]*matrix[6]+cannon_dir[2]*matrix[10];
 */
 	Vector v(x_dir,y_dir,z_dir);
 	v=v.normalize();
 	ball_dir=v;
-
-	//cout<<"Cannon direction is X:- "<<ball_dir.x<<" "<<ball_dir.y<<" "<<ball_dir.z<<" "<<endl;
+	cout<<"Cannon direction is X:- "<<ball_dir.x<<" "<<ball_dir.y<<" "<<ball_dir.z<<" "<<endl;
 }
 
+/*
+ * drawing the cannon by taking the rotation from the rotation control
+ */
 void draw_cannon()
 {
     GLUquadricObj *qobj;
@@ -158,45 +167,49 @@ void draw_cannon()
     gluQuadricDrawStyle(qobj, GLU_FILL);
     gluQuadricNormals(qobj, GLU_FLAT);
     gluCylinder(qobj, 0.0005, 0.5, 3.0, 45, 15);
+//    glFlush();
 
 }
 
 float  translate[16] = { 1.0, 0.0, 0.0, 1.0,0.0, 1.0, 0.0, 0.0,  0.0, 0.0, 1.0, 0.0,  0.0, 0.0, 0.0, 1.0 };
 
-// Draws one frame, the checkerboard then the balls, from the current camera position.
+// Draws one frame, the Room then the balls, from the current camera position.
 void display() {
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
   gluLookAt(camera.getX(), camera.getY(), camera.getZ(),
-            checkerboard.centerx(), 0.0, checkerboard.centerz(),
+            r1.centerx(), 0.0, r1.centerz(),
             0.0, 1.0, 0.0);
-  checkerboard.draw();
+  //glDisable(GL_DEPTH_TEST);
+
 
   glPushMatrix();
-//  glMultMatrixf(translate);
   glMultMatrixf(initial);
+
+  //loading the current model view matrix
+  glGetFloatv (GL_MODELVIEW_MATRIX, matrix);
   draw_cannon();
+  //glFlush();
   glPopMatrix();
-//  find_cannon_dir();
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+  r1.draw();
+
+//  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
 
   for (int i = 0; i < no_of_balls; i++)
   {
-	  balls[i].rolling(i,balls,no_of_balls,width,height);
+	  balls[i].rolling(i,balls,no_of_balls,width,depth,height);
   }
 
   glFlush();
   glutSwapBuffers();
 }
 
-/*
-void Accelerate(double x,double y)
-{
-	  for (int i = 0; i < no_of_balls; i++)
-	  {
-		  	  balls[i].check_inside(x,y);
-	  }
-}
-*/
 
 // On reshape, constructs a camera that perfectly fits the window.
 void reshape(GLint w, GLint h) {
@@ -218,27 +231,31 @@ void timer(int v) {
 
 
 /*
- * function to insert a new ball as specified by the user
+ * function to insert a new ball as specified by the user. The ball is launched as per the specifications specified by the
+ * user. The ball is not launched when the direction of the cannon is not proper. It should be in the room to e able to launch a ball
  */
 void launch_ball(int ID)
 {
 	if(ID==1)
 	{
-			float *dir;
-			direction->get_float_array_val( dir );
+		if(ball_dir.x <0.0 && ball_dir.y <0.0 && ball_dir.z> 0.0)
+		{
+			Vector new_dir(-1*ball_dir.x,ball_dir.y,ball_dir.z);
 
-		  //no_of_balls;
+			cout <<"Launching the ball \n";
+
 			float radius=spinner_radius->get_float_val();
 			float mass=spinner_mass->get_float_val();
 			int id=color_list->get_int_val();
-			//cout<<"id = "<<id<<endl;
+
 			id=id-1;
-//			  find_cannon_dir();
 			cout<<ball_dir.x<<" "<<ball_dir.y<<" "<<ball_dir.z<<endl;
-		  balls[no_of_balls++]=Ball(radius, color_rgb[id], 3.0, 6, 5,ball_dir,mass,spinner_speed->get_int_val());
+			balls[no_of_balls++]=Ball(radius, color_rgb[id], 3.0, 6, 5,new_dir,mass,spinner_speed->get_int_val());
+		}
 	}
 
 }
+
 // Moves the camera according to the key pressed, then ask to refresh the
 // display.
 void special(int key, int, int) {
@@ -248,12 +265,12 @@ void special(int key, int, int) {
     case GLUT_KEY_UP: camera.moveUp(); break;
     case GLUT_KEY_DOWN: camera.moveDown(); break;
   }
-  glutPostRedisplay();
+    glutPostRedisplay();
+
 }
 
 // Initializes GLUT and enters the main loop.
 int main(int argc, char** argv) {
-
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowPosition(80, 80);
@@ -265,7 +282,6 @@ int main(int argc, char** argv) {
 //  glutMouseFunc(MouseClick);
   glutSpecialFunc(special);
 
-
   GLUI_Master.set_glutIdleFunc (NULL);
   /** Now create a GLUI user interface window and add controls **/
   GLUI *glui = GLUI_Master.create_glui( "GLUI", 0 );
@@ -276,16 +292,16 @@ int main(int argc, char** argv) {
   obj_panel = glui->add_panel("Parameters for the balls" );
 
   spinner_mass=glui->add_spinner_to_panel(obj_panel,"Mass",GLUI_SPINNER_FLOAT);
-  spinner_mass->set_float_limits( 0.3, 3.0,GLUI_LIMIT_CLAMP );
-  spinner_mass->set_speed(0.1);
+  spinner_mass->set_float_limits( 0.5, 5.0,GLUI_LIMIT_CLAMP );
+  spinner_mass->set_speed(0.5);
 
   spinner_radius=glui->add_spinner_to_panel(obj_panel,"Radius",GLUI_SPINNER_FLOAT);
-  spinner_radius->set_float_limits( 0.4, 0.7,GLUI_LIMIT_CLAMP );
-  spinner_radius->set_speed(0.1);
+  spinner_radius->set_float_limits( 0.4, 1.0,GLUI_LIMIT_CLAMP );
+  spinner_radius->set_speed(0.5);
 
 
   spinner_speed=glui->add_spinner_to_panel(obj_panel,"Speed",GLUI_SPINNER_INT);
-  spinner_speed->set_float_limits( 1, 20,GLUI_LIMIT_CLAMP );
+  spinner_speed->set_float_limits( 10, 40,GLUI_LIMIT_CLAMP );
   spinner_speed->set_speed(1);
 
 
@@ -294,16 +310,6 @@ int main(int argc, char** argv) {
 
   color_list = glui->add_listbox_to_panel(obj_panel,"Color of the Ball");
 
-/*
-  char *p;
-
-  for(int i=0;i<no_of_colors;i++)
-  {
-	  string l=s_colors[i];
-	  p=&l[0];
-	  color_list->add_item(i+1,p);
-  }
-*/
 
 color_list->add_item(1,"White");
 color_list->add_item(2,"Silver");
@@ -321,7 +327,7 @@ color_list->add_item(13,"Blue");
 color_list->add_item(14,"Navy");
 color_list->add_item(15,"Fuchsia");
 color_list->add_item(16,"Purple");
-color_list->set_int_val(3);
+color_list->set_int_val(4);
 
 //  string s_colors[]={"White","Silver","Gray","Black","Red","Maroon","Yellow","Olive","Lime","Green","Aqua","Teal","Blue","Navy","Fuchsia","Purple"};
 
